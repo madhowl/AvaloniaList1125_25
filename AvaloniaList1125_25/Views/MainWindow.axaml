@@ -23,9 +23,8 @@
                 <!-- у кнопки подставлен другой датаконтекст, для того, чтобы была досупна команда из основной вьюмодели -->
                 <Label Content="{Binding Status}" />
                 <Button Content="Редактировать"
-                        DataContext="{StaticResource Vm}"
-                        x:DataType="ns:MainWindowVM"
-                        Command="{Binding EditNoteCommand}" />
+                        CommandParameter="{Binding}"
+                        Command="{Binding EditNoteCommand, Source={StaticResource Vm}}" />
             </StackPanel>
         </DataTemplate>
     </Window.DataTemplates>
@@ -38,7 +37,6 @@
         </Menu>
         <!-- листбокс получает список из свойства на вьюмодели
         у листбокса указано свойство SelectedItem для контроля выбранной записи -->
-        <ListBox Grid.Row="1" ItemsSource="{Binding Path=Notes}"
-                 SelectedItem="{Binding SelectedNote}" />
+        <ListBox Grid.Row="1" ItemsSource="{Binding Path=Notes}" />
     </Grid>
 </Window>

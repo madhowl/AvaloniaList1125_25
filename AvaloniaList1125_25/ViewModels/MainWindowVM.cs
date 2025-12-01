@@ -12,24 +12,12 @@ namespace AvaloniaList1125_25.ViewModels;
 
 public class MainWindowVM : BaseVM
 {
-    private NoteVM _selectedNote;
     // ObservableCollection уведомляет интерфейс, если в нем меняется кол-во значений
     public ObservableCollection<NoteVM> Notes { get; set; }
 
     // команды представлены свойствами, для того, чтобы работал Binding
     public VMCommand AddNoteCommand { get; set; }
-    public VMCommand EditNoteCommand { get; set; }
-
-    public NoteVM SelectedNote
-    {
-        get => _selectedNote;
-        set
-        {
-            if (Equals(value, _selectedNote)) return;
-            _selectedNote = value;
-            OnPropertyChanged();
-        }
-    }
+    public VMCommandWithArg<NoteVM> EditNoteCommand { get; set; }
 
     public MainWindowVM()
     {
@@ -54,19 +42,15 @@ public class MainWindowVM : BaseVM
                 NoteDBInstance.Get().DB.UpdateNote(newNote);
                 Notes.Add(new NoteVM(newNote));
             }
-            else if (window.Removed)
-            {
-                NoteDBInstance.Get().DB.DeleteNote(SelectedNote.Value);
-            }
         });
         
         // инициализация команды редактирования
-        EditNoteCommand = new(async () =>
+        EditNoteCommand = new(async s =>
         {
-            if (SelectedNote == null)
+            if (s == null)
                 return;
 
-            EditNoteWindow window = new EditNoteWindow(SelectedNote);
+            EditNoteWindow window = new EditNoteWindow(s);
 
             Window main = null;
             if (Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
@@ -75,12 +59,12 @@ public class MainWindowVM : BaseVM
 
             if (window.Saved)
             {
-                NoteDBInstance.Get().DB.UpdateNote(SelectedNote.Value);
+                NoteDBInstance.Get().DB.UpdateNote(s.Value);
             }
             else if (window.Removed)
             {
-                NoteDBInstance.Get().DB.DeleteNote(SelectedNote.Value);
-                Notes.Remove(SelectedNote);
+                NoteDBInstance.Get().DB.DeleteNote(s.Value);
+                Notes.Remove(s);
             }
         });
     }
